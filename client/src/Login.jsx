@@ -1,63 +1,98 @@
 import React, { useState } from "react";
-import "./App.css";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isValidated, setIsValidated] = useState(false);
   const navigate = useNavigate();
 
   // Function to handle form submission
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    axios
-      .post("http://localhost:3001/login", { email, password })
-      .then((result) => {
-        console.log(result);
+
+    const form = e.currentTarget;
+
+    if (form.checkValidity() === false) {
+      e.preventDefault();
+      e.stopPropagation();
+    } else {
+      try {
+        const result = await axios.post("http://localhost:3001/login", {
+          email,
+          password,
+        });
+
         if (result.data === "Success") {
           console.log("LOGIN SUCCESS");
           navigate("/dashboard");
         }
-        // Assuming your backend returns some token upon successful login
-        // You can store the token in local storage or state for authentication
-        // console.log("Login successful");
-        // navigate("/dashboard");
-      })
-      .catch((err) => console.log(err));
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
-    // Reset form fields after submission if needed
+    setIsValidated(true);
+
+    // Reset form fields
     setEmail("");
     setPassword("");
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <div className="container mt-5">
+      <div className="card bg-light">
+        <div className="card-body">
+          <h2 className="card-title text-center mb-4">Login</h2>
+          <form
+            onSubmit={handleLogin}
+            className={isValidated ? "was-validated" : ""}
+            noValidate
+          >
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email:
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <div className="invalid-feedback">
+                Please enter a valid email.
+              </div>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                Password:
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <div className="invalid-feedback">
+                Please enter your password.
+              </div>
+            </div>
+            <button type="submit" className="btn btn-primary btn-block">
+              Login
+            </button>
+          </form>
+          <p className="mt-3 text-center">
+            Don't have an account? <Link to="/signup">Signup</Link>
+          </p>
         </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      <p>Don't have an account?</p>
-      <Link to="/signup">Signup</Link>
+      </div>
     </div>
   );
 }
