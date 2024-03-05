@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function Signup() {
@@ -13,7 +15,7 @@ function Signup() {
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
 
     // Reset validation
@@ -24,6 +26,11 @@ function Signup() {
     // form validation
     if (name === "") {
       setIsNameInvalid(true);
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setIsEmailInvalid(true);
       return;
     }
 
@@ -37,6 +44,21 @@ function Signup() {
       return;
     }
 
+    // Check if the email or password already exists
+    const checkUserExists = await axios.post(
+      "http://localhost:3001/checkUserExists",
+      {
+        email,
+        password,
+      }
+    );
+
+    if (checkUserExists.data.exists) {
+      alert("User with the same email or password already exists.");
+      return;
+    }
+
+    // If the email or password doesn't exist, proceed with user registration
     axios
       .post("http://localhost:3001/register", { name, email, password })
       .then((result) => {
@@ -58,10 +80,12 @@ function Signup() {
           <form onSubmit={handleSignup} className="needs-validation" noValidate>
             <div className="mb-3">
               <label htmlFor="name" className="form-label">
+                <FontAwesomeIcon icon={faUser} className="me-2" />
                 Name:
               </label>
               <input
                 type="text"
+                placeholder="Name"
                 className={`form-control ${isNameInvalid ? "is-invalid" : ""} ${
                   name && !isNameInvalid ? "is-valid" : ""
                 }`}
@@ -79,10 +103,12 @@ function Signup() {
             </div>
             <div className="mb-3">
               <label htmlFor="email" className="form-label">
+                <FontAwesomeIcon icon={faEnvelope} className="me-2" />
                 Email:
               </label>
               <input
                 type="email"
+                placeholder="Email"
                 className={`form-control ${
                   isEmailInvalid ? "is-invalid" : ""
                 } ${email && !isEmailInvalid ? "is-valid" : ""}`}
@@ -102,10 +128,12 @@ function Signup() {
             </div>
             <div className="mb-3">
               <label htmlFor="password" className="form-label">
+                <FontAwesomeIcon icon={faLock} className="me-2" />
                 Password:
               </label>
               <input
                 type="password"
+                placeholder="Password"
                 className={`form-control ${
                   isPasswordInvalid ? "is-invalid" : ""
                 } ${password && !isPasswordInvalid ? "is-valid" : ""}`}

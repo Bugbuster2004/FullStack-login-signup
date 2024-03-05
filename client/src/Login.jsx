@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -54,10 +56,12 @@ function Login() {
           >
             <div className="mb-3">
               <label htmlFor="email" className="form-label">
+                <FontAwesomeIcon icon={faEnvelope} className="me-2" />
                 Email:
               </label>
               <input
                 type="email"
+                placeholder="Email"
                 className="form-control"
                 id="email"
                 value={email}
@@ -70,10 +74,12 @@ function Login() {
             </div>
             <div className="mb-3">
               <label htmlFor="password" className="form-label">
+                <FontAwesomeIcon icon={faLock} className="me-2" />
                 Password:
               </label>
               <input
                 type="password"
+                placeholder="Password"
                 className="form-control"
                 id="password"
                 value={password}

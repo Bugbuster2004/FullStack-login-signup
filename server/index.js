@@ -24,9 +24,22 @@ app.post("/login", (req, res) => {
     }
   });
 });
+
 app.post("/register", (req, res) => {
   EmployeeModel.create(req.body)
     .then((employees) => res.json(employees))
+    .catch((err) => res.json(err));
+});
+app.post("/checkUserExists", (req, res) => {
+  const { email, password } = req.body;
+  EmployeeModel.findOne({ $or: [{ email: email }, { password: password }] })
+    .then((user) => {
+      if (user) {
+        res.json({ exists: true });
+      } else {
+        res.json({ exists: false });
+      }
+    })
     .catch((err) => res.json(err));
 });
 app.listen(3001, () => {
