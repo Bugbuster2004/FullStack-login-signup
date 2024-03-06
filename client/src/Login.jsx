@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -27,9 +27,10 @@ function Login() {
           email,
           password,
         });
-
-        if (result.data === "Success") {
-          console.log("LOGIN SUCCESS");
+        const { user, auth } = result.data;
+        if (auth) {
+          localStorage.setItem("authToken", auth);
+          console.log(auth);
           navigate("/dashboard");
         }
       } catch (err) {

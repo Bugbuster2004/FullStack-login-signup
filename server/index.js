@@ -2,7 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const EmployeeModel = require("./models/Employee");
-
+const Jwt = require("jsonwebtoken");
+const jwtkey = "login-signup";
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -15,7 +16,13 @@ app.post("/login", (req, res) => {
   EmployeeModel.findOne({ email: email }).then((user) => {
     if (user) {
       if (user.password === password) {
-        res.json("Success");
+        Jwt.sign({ user }, jwtkey, (err, token) => {
+          if (err) {
+            res.send({ result: "user not found from token" });
+          }
+          res.send({ user, auth: token });
+        });
+        // res.json("Success");
       } else {
         res.json("PASSWORD INCORRECT");
       }
@@ -25,10 +32,23 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.post("/register", (req, res) => {
-  EmployeeModel.create(req.body)
-    .then((employees) => res.json(employees))
-    .catch((err) => res.json(err));
+app.post("/register", async (req, res) => {
+  try {
+    const newUser = await EmployeeModel.create(req.body);
+
+    // Sign JWT token for the new user
+    Jwt.sign({ user: newUser }, jwtkey, (err, token) => {
+      if (err) {
+        return res.send({ result: "user not found from token" });
+      }
+
+      // Send user data and token
+      return res.send({ user: newUser, auth: token });
+    });
+  } catch (error) {
+    console.error("Error during registration:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 app.post("/checkUserExists", (req, res) => {
   const { email, password } = req.body;

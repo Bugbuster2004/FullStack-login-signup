@@ -89,3 +89,20 @@ form:hover {
 .card {
   background: transparent; /* Set the card background to none to allow body background to show through */
 }
+
+/* Add this CSS for eye icon */
+.fa-eye,
+.fa-eye-slash {
+  font-size: 14px; /* Adjust the font size to make the eye icon smaller */
+}
+
+/* Apply additional styles if needed */
+.fa-eye:hover,
+.fa-eye-slash:hover {
+  color: #ff0000; /* Change color on hover if desired */
+}
+/* 
+.eyebutton {
+  height: 57px;
+
+} */
