@@ -5,6 +5,8 @@ const EmployeeModel = require("./models/Employee");
 const Jwt = require("jsonwebtoken");
 const jwtkey = "login-signup";
 const app = express();
+// const { createServer } = require("vite");
+
 app.use(express.json());
 app.use(cors());
 
@@ -16,7 +18,7 @@ app.post("/login", (req, res) => {
   EmployeeModel.findOne({ email: email }).then((user) => {
     if (user) {
       if (user.password === password) {
-        Jwt.sign({ user }, jwtkey, (err, token) => {
+        Jwt.sign({ user }, jwtkey, { expiresIn: 60 }, (err, token) => {
           if (err) {
             res.send({ result: "user not found from token" });
           }
@@ -50,6 +52,9 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+app.get("/dashboard", verifyToken, (req, res) => {
+  res.json({ message: "Welcome to the dashboard!" });
+});
 app.post("/checkUserExists", (req, res) => {
   const { email, password } = req.body;
   EmployeeModel.findOne({ $or: [{ email: email }, { password: password }] })
@@ -62,6 +67,23 @@ app.post("/checkUserExists", (req, res) => {
     })
     .catch((err) => res.json(err));
 });
+
+function verifyToken(req, res, next) {
+  let token = req.headers["authorization"];
+  if (token) {
+    token = token.split(" ")[1];
+    Jwt.verify(token, jwtkey, (err, valid) => {
+      if (err) {
+        res.status(401).send({ result: "Please provide valid token" });
+      } else {
+        next();
+      }
+    });
+  } else {
+    res.status(403).send({ result: "Please add token with header" });
+  }
+}
+
 app.listen(3001, () => {
   console.log("server is running");
 });
