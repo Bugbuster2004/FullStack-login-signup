@@ -18,7 +18,7 @@ app.post("/login", (req, res) => {
   EmployeeModel.findOne({ email: email }).then((user) => {
     if (user) {
       if (user.password === password) {
-        Jwt.sign({ user }, jwtkey, { expiresIn: 60 }, (err, token) => {
+        Jwt.sign({ user }, jwtkey, (err, token) => {
           if (err) {
             res.send({ result: "user not found from token" });
           }

@@ -5,12 +5,14 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "./AuthComp";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isValidated, setIsValidated] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Function to handle form submission
   const handleLogin = async (e) => {
@@ -31,6 +33,7 @@ function Login() {
         if (auth) {
           localStorage.setItem("authToken", auth);
           console.log(auth);
+          login();
           navigate("/dashboard");
         }
       } catch (err) {
